@@ -25,9 +25,12 @@ public:
 
     virtual void render(int max_width, int max_height, png_bytep* &png_vec) = 0;
 
-    void setR2Point(int x, int y);
+    void setPoint(int x, int y);
+    R2Point& getPoint();
     bool getSkipRender();
     void setSkipRender(bool skipRender);
+
+    void setRGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A);
 };
 
 

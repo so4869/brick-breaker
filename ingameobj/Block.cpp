@@ -7,6 +7,8 @@
 #include <string>
 #include <algorithm>
 
+#include "Ball.h"
+
 // -----------------------------------------
 // 픽셀 찍기
 // -----------------------------------------
@@ -195,7 +197,7 @@ void drawRectangleWithNumber(
 
 Block::Block(int x, int y, int width, int height, int maxHp, int hp, unsigned char R, unsigned char G, unsigned char B):
     ImageRenderable(R, G, B, 255), width(width), height(height), maxHp(maxHp), hp(hp){
-    this->setR2Point(x, y);
+    this->setPoint(x, y);
     this->A = hp / maxHp * 255;
 }
 
@@ -203,3 +205,58 @@ void Block::render(int max_width, int max_height, png_bytep *&png_vec) {
     drawRectangleWithNumber(png_vec, max_width, max_height, point.get_x(), point.get_y(),  width, height, hp, 2, R, G, B, A);
 }
 
+
+int Block::getWidth() {
+    return width;
+}
+void Block::setWidth(int width) {
+    this->width = width;
+}
+
+int Block::getHeight() {
+    return height;
+}
+void Block::setHeight(int height) {
+    this->height = height;
+}
+
+int Block::getHp() {
+    return hp;
+}
+void Block::setHp(int hp) {
+    this->hp = hp;
+    // this->A = hp / maxHp * 255;
+}
+
+int Block::meet(Ball &ball) {
+    R2Point ballPoint = ball.getPoint();
+
+    double bx = ballPoint.get_x();
+    double by = ballPoint.get_y();
+    double br = ball.getRadius();
+
+    double x = point.get_x();
+    double y = point.get_y();
+
+    double x_in = std::max(x - bx - br, bx - (x + width) - br);
+    double y_in = std::max(y - by - br, by - (y + height) - br);
+    if(x_in <= 0 && y_in <= 0) {
+        if(x_in > y_in) {
+            return 1;
+        }
+        else if(x_in < y_in) {
+            return 2;
+        }
+        else if(x_in == y_in) {
+            return 3;
+        }
+    }
+
+    else return 0;
+}
+
+void Block::hit(Ball &ball) {
+    if (meet(ball)) {
+        hp--;
+    }
+}

@@ -88,12 +88,12 @@ void MyFrame::bindEvent(MyApp &my_app) {
 
     bitmap_->Bind(wxEVT_LEFT_DOWN, [this, &my_app](wxMouseEvent &e) {
         // bitmap_->CaptureMouse();
-        std::cout << "mouse down" << std::endl;
+        // std::cout << "mouse down" << std::endl;
         my_app.mouseLeftDownEventListener(e);
         e.Skip();
     });
     bitmap_->Bind(wxEVT_LEFT_UP, [this, &my_app](wxMouseEvent &e) {
-        std::cout << "mouse up" << std::endl;
+        // std::cout << "mouse up" << std::endl;
         // if (bitmap_->HasCapture()) {
         //     bitmap_->ReleaseMouse();
         // }
@@ -101,7 +101,7 @@ void MyFrame::bindEvent(MyApp &my_app) {
         e.Skip();
     });
     this->bitmap_->Bind(wxEVT_MOTION, [this, &my_app](wxMouseEvent &e) {
-        std::cout << "mouse move" << std::endl;
+        // std::cout << "mouse move" << std::endl;
         my_app.mouseMotionEventListener(e);
         e.Skip();
     });
@@ -115,15 +115,15 @@ void MyFrame::OnTimer(wxTimerEvent &event) {
         return;
     }
 
-    // // lock
-    // std::lock_guard lock(*this->pngMutex);
-    //
-    // // skip if data not ready.
-    // if (this->pngData->empty()) {
-    //     return;
-    // }
-    //
-    // RenderImage(this->pngData);
+    // lock
+    std::lock_guard lock(*this->pngMutex);
+
+    // skip if data not ready.
+    if (this->pngData->empty()) {
+        return;
+    }
+
+    RenderImage(this->pngData);
 
     // // lock shared data
     // std::vector<unsigned char> pngDataCopy;
@@ -145,9 +145,9 @@ void MyFrame::OnTimer(wxTimerEvent &event) {
     //     RenderImage(&pngDataCopy);
     // })
 
-    // wxCallAfter로 GUI 안전한 방식으로 업데이트
-    this->CallAfter([this]() {
-        std::lock_guard lock(*this->pngMutex);
-        RenderImage(this->pngData);
-    });
+    // // wxCallAfter로 GUI 안전한 방식으로 업데이트
+    // this->CallAfter([this]() {
+    //     std::lock_guard lock(*this->pngMutex);
+    //     RenderImage(this->pngData);
+    // });
 }

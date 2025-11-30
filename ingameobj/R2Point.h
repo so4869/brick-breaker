@@ -9,15 +9,15 @@
 
 class R2Point {
 protected:
-    int x = 0, y = 0;
+    double x = 0, y = 0;
 
 public:
-    int get_x();
-    int get_y();
+    double get_x();
+    double get_y();
 
-    void set_x(int x);
-    void set_y(int y);
-    void set_xy(int x, int y);
+    void set_x(double x);
+    void set_y(double y);
+    void set_xy(double x, double y);
 };
 
 

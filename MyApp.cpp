@@ -54,6 +54,16 @@ bool MyApp::OnInit() {
         }
     });
 
+    // thread 시작, sleep time for 120 fps
+    this->background_thread = std::thread([this]() {
+        while (!this->stopFlag.load()) {
+            // this->game->collisionWall();
+            // this->game->collisionBlock();
+            this->game->checkCurrentPhaseOver();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 120 * 2));
+        }
+    });
+
     this->frame->bindEvent(*this);
     this->frame->Show(true);
 
@@ -66,6 +76,10 @@ int MyApp::OnExit() {
     // join render thread to main thread if possible
     if (this->image_render_thread.joinable()) {
         this->image_render_thread.join();
+    }
+    // join render thread to main thread if possible
+    if (this->background_thread.joinable()) {
+        this->background_thread.join();
     }
 
     // release png_bytep data

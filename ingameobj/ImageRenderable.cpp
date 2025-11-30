@@ -4,8 +4,12 @@
 
 #include "ImageRenderable.h"
 
-void ImageRenderable::setR2Point(const int x, const int y) {
+void ImageRenderable::setPoint(const int x, const int y) {
     this->point.set_xy(x, y);
+}
+
+R2Point& ImageRenderable::getPoint() {
+    return this->point;
 }
 
 bool ImageRenderable::getSkipRender() {
@@ -14,4 +18,11 @@ bool ImageRenderable::getSkipRender() {
 
 void ImageRenderable::setSkipRender(const bool skipRender) {
     this->skipRender = skipRender;
+}
+
+void ImageRenderable::setRGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) {
+    this->R = R;
+    this->G = G;
+    this->B = B;
+    this->A = A;
 }

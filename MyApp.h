@@ -16,6 +16,7 @@
 class MyApp : public wxApp {
 private:
     std::thread image_render_thread;
+    std::thread background_thread;
     std::atomic<bool> stopFlag = {false};
 
     std::mutex pngMutex;

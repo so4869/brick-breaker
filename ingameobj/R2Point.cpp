@@ -4,24 +4,24 @@
 
 #include "R2Point.h"
 
-int R2Point::get_x() {
+double R2Point::get_x() {
     return this->x;
 }
 
-int R2Point::get_y() {
+double R2Point::get_y() {
     return this->y;
 }
 
 
-void R2Point::set_x(int x){
+void R2Point::set_x(double x){
     this->x = x;
 }
 
-void R2Point::set_y(int y){
+void R2Point::set_y(double y){
     this->y = y;
 }
 
-void R2Point::set_xy(int x, int y){
+void R2Point::set_xy(double x, double y){
     this->x = x;
     this->y = y;
 }

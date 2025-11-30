@@ -113,6 +113,26 @@ Ball::Ball(const int center_x, const int center_y, const double radius,
     this->point.set_xy(center_x, center_y);
 }
 
+double Ball::getRadius() {
+    return this->radius;
+}
+
+void Ball::setdx(double dx_) {dx = dx_;}
+void Ball::setdy(double dy_) {dy = dy_;}
+double Ball::getdx() {return dx;}
+double Ball::getdy() {return dy;}
+
+void Ball::reverseDx() {
+    this->dx = -this->dx;
+}
+void Ball::reverseDy() {
+    this->dy = -this->dy;
+}
+
+void Ball::move() {
+    point.set_xy(point.get_x() + dx, point.get_y() + dy);
+}
+
 
 void Ball::render(const int max_width, const int max_height, png_bytep *&png_bytep_data) {
     // drawFilledCircleRGBA(png_bytep_data, max_width, max_height, this->point.get_x(), this->point.get_y(),
@@ -121,6 +141,8 @@ void Ball::render(const int max_width, const int max_height, png_bytep *&png_byt
     //     static_cast<int>(this->radius * 0.8), 255, 255, 255, 255);
     // drawFilledCircleRGBA(png_bytep_data, max_width, max_height, this->point.get_x(), this->point.get_y(),
     //     static_cast<int>(this->radius * 0.5), this->R, this->G, this->B, this->A);
+
+    this->move();
 
     drawFilledCircleRGBA(png_bytep_data, max_width, max_height, this->point.get_x(), this->point.get_y(),
         static_cast<int>(this->radius), this->R, this->G, this->B, this->A);
