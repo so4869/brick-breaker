@@ -3,6 +3,7 @@
 //
 
 #include "Ball.h"
+#include <cmath>
 
 // img: height x width x 4 (RGBA)인 평면 버퍼라고 가정
 //      img.size() == height * width * 4

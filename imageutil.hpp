@@ -1,6 +1,8 @@
 #pragma once
 
 #include <setjmp.h>   // jmp_buf 정의
+#include <vector>
+
 extern "C" {
 #include <png.h>      // libpng
 }

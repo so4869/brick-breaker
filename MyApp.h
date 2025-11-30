@@ -5,6 +5,7 @@
 #ifndef MYAPP_H
 #define MYAPP_H
 
+#include <atomic>
 #include <wx/wx.h>
 #include <vector>
 #include <thread>

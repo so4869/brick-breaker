@@ -4,6 +4,9 @@
 
 #ifndef RENDERABLE_H
 #define RENDERABLE_H
+
+#include <cstdio>
+#include <png.h>
 #include <pngconf.h>
 #include <vector>
 

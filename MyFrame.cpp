@@ -87,19 +87,23 @@ void MyFrame::bindEvent(MyApp &my_app) {
 
 
     bitmap_->Bind(wxEVT_LEFT_DOWN, [this, &my_app](wxMouseEvent &e) {
-        bitmap_->CaptureMouse();
-        // std::cout << "mouse down" << std::endl;
+        // bitmap_->CaptureMouse();
+        std::cout << "mouse down" << std::endl;
         my_app.mouseLeftDownEventListener(e);
+        e.Skip();
     });
     bitmap_->Bind(wxEVT_LEFT_UP, [this, &my_app](wxMouseEvent &e) {
-        // std::cout << "mouse up" << std::endl;
-        if (bitmap_->HasCapture()) {
-            bitmap_->ReleaseMouse();
-        }
+        std::cout << "mouse up" << std::endl;
+        // if (bitmap_->HasCapture()) {
+        //     bitmap_->ReleaseMouse();
+        // }
         my_app.mouseLeftUpEventListener(e);
+        e.Skip();
     });
-    this->bitmap_->Bind(wxEVT_MOTION, [this, &my_app](const wxMouseEvent &e) {
+    this->bitmap_->Bind(wxEVT_MOTION, [this, &my_app](wxMouseEvent &e) {
+        std::cout << "mouse move" << std::endl;
         my_app.mouseMotionEventListener(e);
+        e.Skip();
     });
 }
 

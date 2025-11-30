@@ -1,11 +1,12 @@
-#pragma once
-
 #include <iostream>
 #include <setjmp.h>
 #include <cmath>
+#include <algorithm>
 #include <png.h>
 
 #include "imageutil.hpp"
+
+#include <vector>
 
 // libpng가 쓰는 메모리 버퍼
 struct PngBuffer {

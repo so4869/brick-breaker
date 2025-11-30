@@ -3,12 +3,13 @@
 //
 
 #include "Game.h"
-#include "Block.h"
 
 #include <iostream>
 #include <ostream>
+#include <random>
 
 #include "ingameobj/Ball.h"
+#include "ingameobj/Block.h"
 
 Game::Game(const int width, const int height): width(width), height(height) {
 }
@@ -24,7 +25,7 @@ Game::~Game() {
 void Game::gameStart(const int level) {
     // init level
     this->level = level;
-    int empty_position = random() % max_block_cnt_x;
+    int empty_position = rand() % max_block_cnt_x;
 
     int block_width = (width - block_margin * max_block_cnt_x * 2) / max_block_cnt_x;
     int block_height = (ingameHeight - block_margin * max_block_cnt_y * 2) / max_block_cnt_y;
@@ -83,16 +84,18 @@ void Game::onMouseLeftDown(const wxMouseEvent &e) {
     const auto p = e.GetPosition();
     this->mouse_down_x = p.x;
     this->mouse_down_y = p.y;
-    // std::cout << "mouse down" << std::endl;
+    //std::cout << "game: mouse down" << std::endl;
 }
 
 void Game::onMouseLeftUp(const wxMouseEvent &e) {
     main_arrow_helper->setSkipRender(true);
     fire();
-    // std::cout << "mouse up" << std::endl;
+    //std::cout << "game: mouse up" << std::endl;
 }
 
 void Game::onMouseMove(const wxMouseEvent &e) {
+    //std::cout << "mouse move" << std::endl;
+    //std::cout << e.Dragging() << ", , " << e.LeftIsDown() << std::endl;
     if (e.Dragging() && e.LeftIsDown()) {
         const wxPoint p = e.GetPosition();
 

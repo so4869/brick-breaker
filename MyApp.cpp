@@ -4,6 +4,8 @@
 
 #include "MyApp.h"
 
+#include <cstring>
+
 #include "imageutil.hpp"
 
 void MyApp::consist_png() {

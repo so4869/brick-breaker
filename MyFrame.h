@@ -5,6 +5,8 @@
 #ifndef MYFRAME_H
 #define MYFRAME_H
 
+#include <mutex>
+#include <vector>
 #include <wx/wx.h>
 #include <wx/statbmp.h>
 
