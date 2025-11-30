@@ -9,7 +9,7 @@ PNG_LIBS   := $(shell pkg-config --libs   libpng)
 CXXFLAGS := -std=c++17 -g -Wall $(WX_CXXFLAGS) $(PNG_CFLAGS)
 LDFLAGS  := $(WX_LIBS) $(PNG_LIBS) -pthread
 
-TARGET = sg-prj-aie2051
+TARGET = brick-breaker
 SRCS   = imageutil.cpp ingameobj/ImageRenderable.cpp ingameobj/R2Point.cpp ingameobj/Ball.cpp ingameobj/ArrowHelper.cpp Game.cpp MyFrame.cpp MyApp.cpp main.cpp
 OBJS   = $(SRCS:.cpp=.o)
 
