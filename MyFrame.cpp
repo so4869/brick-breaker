@@ -8,7 +8,7 @@
 #include <wx/mstream.h>
 
 MyFrame::MyFrame(const int width, const int height)
-        : wxFrame(nullptr, wxID_ANY, "sg-prj-aie2051", wxDefaultPosition,
+        : wxFrame(nullptr, wxID_ANY, "brick-breaker", wxDefaultPosition,
             wxSize(width, height)), width(width), height(height),
             renderTimer(this)
 {
