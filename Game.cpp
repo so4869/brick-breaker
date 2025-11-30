@@ -3,6 +3,11 @@
 //
 
 #include "Game.h"
+#include "Block.h"
+
+#include <iostream>
+#include <ostream>
+
 #include "ingameobj/Ball.h"
 
 Game::Game(const int width, const int height): width(width), height(height) {
@@ -17,7 +22,29 @@ Game::~Game() {
 
 
 void Game::gameStart(const int level) {
-    auto* main_ball = new Ball(50, 350, 6, 91, 168, 244, 255);
+    // init level
+    this->level = level;
+    int empty_position = random() % max_block_cnt_x;
+
+    int block_width = (width - block_margin * max_block_cnt_x * 2) / max_block_cnt_x;
+    int block_height = (ingameHeight - block_margin * max_block_cnt_y * 2) / max_block_cnt_y;
+
+    std::cout << "block_width: " << block_width << ", block_height: " << block_height << std::endl;
+
+    for (int i = 0; i < max_block_cnt_x; i++) {
+        if (i == empty_position) {
+            continue;
+        }
+
+        auto* block = new Block(block_margin + i * (block_width + block_margin), block_margin, block_width, block_height, level, level, 255, 0, 0);
+
+        objects.push_back(block);
+        blocks.push_back(block);
+
+        // std::cout << block->getSkipRender() << std::endl; // ( false
+    }
+
+    main_ball = new Ball(50, 350, 6, 91, 168, 244, 255);
     main_arrow_helper = new ArrowHelper(50, 350, 100, 0, 91, 168, 244, 128);
     main_arrow_helper->setSkipRender(true);
 
@@ -45,6 +72,10 @@ void Game::render(png_bytep* png_bytep_data) {
     }
 }
 
+void Game::fire() {
+
+}
+
 
 void Game::onMouseLeftDown(const wxMouseEvent &e) {
     main_arrow_helper->setSkipRender(false);
@@ -57,6 +88,7 @@ void Game::onMouseLeftDown(const wxMouseEvent &e) {
 
 void Game::onMouseLeftUp(const wxMouseEvent &e) {
     main_arrow_helper->setSkipRender(true);
+    fire();
     // std::cout << "mouse up" << std::endl;
 }
 

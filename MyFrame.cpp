@@ -6,6 +6,7 @@
 
 #include "MyApp.h"
 #include <wx/mstream.h>
+#include <wx/event.h>
 
 MyFrame::MyFrame(const int width, const int height)
         : wxFrame(nullptr, wxID_ANY, "brick-breaker", wxDefaultPosition,
@@ -15,7 +16,7 @@ MyFrame::MyFrame(const int width, const int height)
     bitmap_ = new wxStaticBitmap(this, wxID_ANY, wxImage());
     // bmp->SetBitmap(image);
     auto* sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(bitmap_, 1, wxEXPAND | wxALL | wxALIGN_CENTER, 0);
+    sizer->Add(bitmap_, 1, wxEXPAND | wxALL, 0);
     this->SetSizer(sizer);
 
     this->Bind(wxEVT_TIMER, &MyFrame::OnTimer, this);
@@ -110,13 +111,39 @@ void MyFrame::OnTimer(wxTimerEvent &event) {
         return;
     }
 
-    // lock
-    std::lock_guard lock(*this->pngMutex);
+    // // lock
+    // std::lock_guard lock(*this->pngMutex);
+    //
+    // // skip if data not ready.
+    // if (this->pngData->empty()) {
+    //     return;
+    // }
+    //
+    // RenderImage(this->pngData);
 
-    // skip if data not ready.
-    if (this->pngData->empty()) {
-        return;
-    }
+    // // lock shared data
+    // std::vector<unsigned char> pngDataCopy;
+    // {
+    //     std::lock_guard lock(*this->pngMutex);
+    //
+    //     // skip if data not ready.
+    //     if (this->pngData->empty()) {
+    //         return;
+    //     }
+    //
+    //     // 복사본 생성
+    //     pngDataCopy = *this->pngData;
+    // }
+    //
+    // // wxCallAfter로 GUI 안전한 방식으로 업데이트
+    // this->CallAfter([this, pngDataCopy]() {
+    //     std::lock_guard lock(*this->pngMutex);
+    //     RenderImage(&pngDataCopy);
+    // })
 
-    RenderImage(this->pngData);
+    // wxCallAfter로 GUI 안전한 방식으로 업데이트
+    this->CallAfter([this]() {
+        std::lock_guard lock(*this->pngMutex);
+        RenderImage(this->pngData);
+    });
 }

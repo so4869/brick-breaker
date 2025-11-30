@@ -10,7 +10,7 @@ CXXFLAGS := -std=c++17 -g -Wall $(WX_CXXFLAGS) $(PNG_CFLAGS)
 LDFLAGS  := $(WX_LIBS) $(PNG_LIBS) -pthread
 
 TARGET = brick-breaker
-SRCS   = imageutil.cpp ingameobj/ImageRenderable.cpp ingameobj/R2Point.cpp ingameobj/Ball.cpp ingameobj/ArrowHelper.cpp Game.cpp MyFrame.cpp MyApp.cpp main.cpp
+SRCS   = imageutil.cpp ingameobj/ImageRenderable.cpp ingameobj/R2Point.cpp ingameobj/Ball.cpp ingameobj/Block.cpp ingameobj/ArrowHelper.cpp Game.cpp MyFrame.cpp MyApp.cpp main.cpp
 OBJS   = $(SRCS:.cpp=.o)
 
 all: $(TARGET)
