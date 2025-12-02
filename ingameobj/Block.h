@@ -11,13 +11,13 @@
 
 class Block : public ImageRenderable {
 private:
-    int width = 0;
-    int height = 0;
-    int hp = 0;
-    int maxHp = 0;
+    int width_ = 0;
+    int height_ = 0;
+    int hp_ = 0;
+    int max_hp_ = 0;
 public:
-    Block(int x, int y, int width, int height, int maxHp, int hp,
-        unsigned char R, unsigned char G, unsigned char B);
+    Block(int x, int y, int width, int height, int max_hp, int hp,
+        unsigned char r, unsigned char g, unsigned char b);
 
     int getWidth();
     void setWidth(int width);

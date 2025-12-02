@@ -11,7 +11,7 @@ class ArrowHelper : public ImageRenderable {
     double radius, theta;
 public:
     ArrowHelper(int center_x, int center_y, double radius, double theta,
-        unsigned char R, unsigned char G, unsigned char B, unsigned char A);
+        unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
     void render(int max_width, int max_height, png_bytep* &png_vec) override;
 

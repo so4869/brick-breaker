@@ -8,9 +8,9 @@
 #include "../imageutil.hpp"
 
 ArrowHelper::ArrowHelper(int center_x, int center_y, double radius, double theta,
-    unsigned char R, unsigned char G, unsigned char B, unsigned char A): ImageRenderable(R, G, B, A),
+    unsigned char r, unsigned char g, unsigned char b, unsigned char a): ImageRenderable(r, g, b, a),
         radius(radius), theta(theta) {
-    this->point.set_xy(center_x, center_y);
+    this->point.setXY(center_x, center_y);
 }
 
 
@@ -28,7 +28,7 @@ void ArrowHelper::render(int max_width, int max_height, png_bytep* &png_vec) {
         14.0f,        // arrow length
         14.0f,        // arrow width
         100.0f,
-        R, G, B, A
+        r_, g_, b_, a_
     );
 }
 

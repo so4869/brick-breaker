@@ -10,8 +10,8 @@
 
 MyFrame::MyFrame(const int width, const int height)
         : wxFrame(nullptr, wxID_ANY, "brick-breaker", wxDefaultPosition,
-            wxSize(width, height + 50)), width(width), height(height + 50),
-            renderTimer(this)
+            wxSize(width, height + 50)), width_(width), height_(height + 50),
+            render_timer_(this)
 {
     bitmap_ = new wxStaticBitmap(this, wxID_ANY, wxImage());
     // bmp->SetBitmap(image);
@@ -20,7 +20,7 @@ MyFrame::MyFrame(const int width, const int height)
     this->SetSizer(sizer);
 
     this->Bind(wxEVT_TIMER, &MyFrame::OnTimer, this);
-    this->renderTimer.Start(1000 / 120);
+    this->render_timer_.Start(1000 / 120);
 
     // bitmap_->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent &e) {
     //     bitmap_->CaptureMouse();
@@ -41,7 +41,7 @@ MyFrame::MyFrame(const int width, const int height)
     // });
 }
 
-void MyFrame::RenderImage(const std::vector<unsigned char> *pngData) {
+void MyFrame::renderImage(const std::vector<unsigned char> *png_data) {
 
     if (!this->IsShown()) {
         std::cout << "It is not shown yet. Therefore render will be skipped." << std::endl;
@@ -49,7 +49,7 @@ void MyFrame::RenderImage(const std::vector<unsigned char> *pngData) {
     }
 
     // 메모리 버퍼 → wxMemoryInputStream → wxImage(PNG)
-    wxMemoryInputStream memStream(pngData->data(), pngData->size());
+    wxMemoryInputStream memStream(png_data->data(), png_data->size());
     const wxImage image(memStream, wxBITMAP_TYPE_PNG);
 
     if (!image.IsOk()) {
@@ -61,9 +61,9 @@ void MyFrame::RenderImage(const std::vector<unsigned char> *pngData) {
     bitmap_->SetBitmap(image);
 }
 
-void MyFrame::SetPngDataPtr(std::vector<unsigned char> *data, std::mutex *mutex) {
-    this->pngData = data;
-    this->pngMutex = mutex;
+void MyFrame::setPngDataPtr(std::vector<unsigned char> *data, std::mutex *mutex) {
+    this->png_data_ = data;
+    this->png_mutex_ = mutex;
 }
 
 
@@ -111,19 +111,19 @@ void MyFrame::bindEvent(MyApp &my_app) {
 
 void MyFrame::OnTimer(wxTimerEvent &event) {
     // skip if data not ready.
-    if (!this->pngData || !this->pngMutex) {
+    if (!this->png_data_ || !this->png_mutex_) {
         return;
     }
 
     // lock
-    std::lock_guard lock(*this->pngMutex);
+    std::lock_guard lock(*this->png_mutex_);
 
     // skip if data not ready.
-    if (this->pngData->empty()) {
+    if (this->png_data_->empty()) {
         return;
     }
 
-    RenderImage(this->pngData);
+    renderImage(this->png_data_);
 
     // // lock shared data
     // std::vector<unsigned char> pngDataCopy;

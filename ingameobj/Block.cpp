@@ -170,61 +170,36 @@ void drawRectangleWithNumber(
 }
 
 
-
-// void drawRectangleWithNumber(
-//     png_bytep* img,
-//     const int maxWidth, const int maxHeight,
-//     const int cx, const int cy,
-//     const int width, const int height,
-//     const int number,
-//     const unsigned char R,
-//     const unsigned char G,
-//     const unsigned char B,
-//     const unsigned char A)
-// {
-//
-//     for (int y = std::max(0, cy); y <= std::min(cy + height, maxHeight); ++y) {
-//         for (int x = std::max(0, cx); x <= std::min(cx + width, maxWidth); ++x) {
-//             png_bytep px = &(img[y][x * 4]);
-//
-//             px[0] = static_cast<unsigned char>(R);
-//             px[1] = static_cast<unsigned char>(G);
-//             px[2] = static_cast<unsigned char>(B);
-//             px[3] = static_cast<unsigned char>(A);
-//         }
-//     }
-// }
-
-Block::Block(int x, int y, int width, int height, int maxHp, int hp, unsigned char R, unsigned char G, unsigned char B):
-    ImageRenderable(R, G, B, 255), width(width), height(height), maxHp(maxHp), hp(hp){
+Block::Block(int x, int y, int width, int height, int max_hp, int hp, unsigned char r, unsigned char g, unsigned char b):
+    ImageRenderable(r, g, b, 255), width_(width), height_(height), max_hp_(max_hp), hp_(hp){
     this->setPoint(x, y);
-    this->A = hp / maxHp * 255;
+    this->a_ = hp / max_hp * 255;
 }
 
 void Block::render(int max_width, int max_height, png_bytep *&png_vec) {
-    drawRectangleWithNumber(png_vec, max_width, max_height, point.get_x(), point.get_y(),  width, height, hp, 2, R, G, B, A);
+    drawRectangleWithNumber(png_vec, max_width, max_height, point.get_x(), point.get_y(),  width_, height_, hp_, 2, r_, g_, b_, a_);
 }
 
 
 int Block::getWidth() {
-    return width;
+    return width_;
 }
 void Block::setWidth(int width) {
-    this->width = width;
+    this->width_ = width;
 }
 
 int Block::getHeight() {
-    return height;
+    return height_;
 }
 void Block::setHeight(int height) {
-    this->height = height;
+    this->height_ = height;
 }
 
 int Block::getHp() {
-    return hp;
+    return hp_;
 }
 void Block::setHp(int hp) {
-    this->hp = hp;
+    this->hp_ = hp;
     // this->A = hp / maxHp * 255;
 }
 
@@ -238,8 +213,8 @@ int Block::meet(Ball &ball) {
     double x = point.get_x();
     double y = point.get_y();
 
-    double x_in = std::max(x - bx - br, bx - (x + width) - br);
-    double y_in = std::max(y - by - br, by - (y + height) - br);
+    double x_in = std::max(x - bx - br, bx - (x + width_) - br);
+    double y_in = std::max(y - by - br, by - (y + height_) - br);
     if(x_in <= 0 && y_in <= 0) {
         if(x_in > y_in) {
             return 1;
@@ -257,6 +232,6 @@ int Block::meet(Ball &ball) {
 
 void Block::hit(Ball &ball) {
     if (meet(ball)) {
-        hp--;
+        hp_--;
     }
 }

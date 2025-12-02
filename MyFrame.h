@@ -15,20 +15,20 @@ class MyApp;
 // wxWidgets Frame: 메모리에서 만든 PNG를 바로 wxImage로 읽어와서 띄움
 class MyFrame : public wxFrame {
 private:
-    int width, height;
+    int width_, height_;
     wxStaticBitmap* bitmap_;
-    wxTimer renderTimer;
+    wxTimer render_timer_;
 
-    std::vector<unsigned char> *pngData = nullptr;
-    std::mutex *pngMutex = nullptr;
+    std::vector<unsigned char> *png_data_ = nullptr;
+    std::mutex *png_mutex_ = nullptr;
 
     void OnTimer(wxTimerEvent &event);
 
 public:
     // MyFrame(MyApp *my_app);
     MyFrame(int width, int height);
-    void RenderImage(const std::vector<unsigned char> *pngData);
-    void SetPngDataPtr(std::vector<unsigned char> *data, std::mutex *mutex);
+    void renderImage(const std::vector<unsigned char> *png_data);
+    void setPngDataPtr(std::vector<unsigned char> *data, std::mutex *mutex);
     void bindEvent(MyApp &my_app);
 };
 

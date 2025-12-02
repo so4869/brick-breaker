@@ -12,45 +12,65 @@
 #include "ingameobj/Ball.h"
 #include "ingameobj/Block.h"
 
-Game::Game(const int width, const int height): width(width), height(height), startX(width / 2) {
-    main_arrow_helper = new ArrowHelper(50, 350, 100, 0, 91, 168, 244, 128);
-    main_arrow_helper->setSkipRender(true);
-    objects.push_back(main_arrow_helper);
+Game::Game(const int width, const int height): width_(width), height_(height), start_x_(width / 2) {
+    main_arrow_helper_ = new ArrowHelper(50, 350, 100, 0, 91, 168, 244, 128);
+    main_arrow_helper_->setSkipRender(true);
+    objects_.push_back(main_arrow_helper_);
 }
 
 Game::~Game() {
     // release ImageRenderable objects
-    for (ImageRenderable* &it : objects) {
+    for (ImageRenderable* &it : objects_) {
         delete it;
     }
 }
 
 
-void Game::gameStart(const int level) {
-    // init level
-    this->level = level;
-    int empty_position = rand() % max_block_cnt_x;
+void Game::init() {
+    {
+        std::lock_guard lg(balls_mutex_);
+        balls_.clear();
+    }
+    {
+        std::lock_guard lg(blocks_mutex_);
+        blocks_.clear();
+    }
 
-    int block_width = (width - block_margin * max_block_cnt_x * 2) / max_block_cnt_x;
-    int block_height = (ingameHeight - block_margin * max_block_cnt_y * 2) / max_block_cnt_y;
+    for (ImageRenderable* &it : objects_) {
+        delete it;
+    }
+    objects_.clear();
+
+    main_ball_ = nullptr;
+}
+
+
+void Game::gameStart(const int level) {
+
+    // init level
+    this->level_ = level;
+    int empty_position = rand() % max_block_cnt_x_;
+
+    int block_width = (width_ - block_margin_ * max_block_cnt_x_ * 2) / max_block_cnt_x_;
+    int block_height = (ingame_height_ - block_margin_ * max_block_cnt_y_ * 2) / max_block_cnt_y_;
 
     // std::cout << "block_width: " << block_width << ", block_height: " << block_height << std::endl;
 
     {
-        std::lock_guard lg2(blocksMutex);
+        std::lock_guard lg2(blocks_mutex_);
         //std::cout << "phase 0" << std::endl;
-        for (int i = 0; i < max_block_cnt_x; i++) {
+        for (int i = 0; i < max_block_cnt_x_; i++) {
             if (i == empty_position) {
                 continue;
             }
             //std::cout << "phase 12" << std::endl;
 
-            auto* block = new Block(block_margin + i * (block_width + block_margin), block_margin, block_width, block_height, level, level, 255, 0, 0);
+            auto* block = new Block(block_margin_ + i * (block_width + block_margin_), block_margin_, block_width, block_height, level, level, 255, 0, 0);
 
             //std::cout << "phase 13" << std::endl;
-            objects.push_back(block);
+            objects_.push_back(block);
             //std::cout << "phase 14" << std::endl;
-            blocks.push_back(block);
+            blocks_.push_back(block);
             //std::cout << "phase 15" << std::endl;
 
             // std::cout << block->getSkipRender() << std::endl; // ( false
@@ -58,43 +78,51 @@ void Game::gameStart(const int level) {
     }
 
     // std::cout << "phase 1" << std::endl;
-    std::cout << "blocks cnt: " << blocks.size() << std::endl;
+    // std::cout << "blocks cnt: " << blocks_.size() << std::endl;
 
-    auto* ball = new Ball(startX, height - 6, 6, 91, 168, 244, 255);
-    if (main_ball == nullptr) {
-        main_ball = ball;
+    auto* ball = new Ball(start_x_, height_ - 6, 6, 91, 168, 244, 255);
+    if (main_ball_ == nullptr) {
+        main_ball_ = ball;
     }
     else {
-        auto& mainBallPoint = main_ball->getPoint();
+        auto& mainBallPoint = main_ball_->getPoint();
         auto& newBallPoint = ball->getPoint();
-        newBallPoint.set_xy(mainBallPoint.get_x(), mainBallPoint.get_y());
+        newBallPoint.setXY(mainBallPoint.get_x(), mainBallPoint.get_y());
     }
 
     {
-        std::lock_guard lg(ballsMutex);
-        balls.push_back(ball);
+        std::lock_guard lg(balls_mutex_);
+        balls_.push_back(ball);
     }
-    objects.push_back(ball);
+    objects_.push_back(ball);
+
+    game_over_.store(false);
 }
 
 void Game::gameOver() {
-    std::lock_guard lg2(blocksMutex);
-    for(Block *block : blocks) {
+    std::lock_guard lg2(blocks_mutex_);
+    for(Block *block : blocks_) {
         block->setRGBA(30, 30, 30, 255);
     }
+
+    game_over_.store(true);
 }
 
 bool Game::isGameOver() {
-    std::lock_guard lg2(blocksMutex);
+    return game_over_.load();
+}
+
+bool Game::checkGameOver() {
+    std::lock_guard lg2(blocks_mutex_);
     int i = 0;
-    for(Block *block : blocks) {
+    for(Block *block : blocks_) {
         if (i >= 6) {
             break;
         }
 
         auto& point = block->getPoint();
         auto end = block->getHeight() + point.get_y();
-        if (height <= end) {
+        if (height_ <= end) {
             return true;
         }
 
@@ -108,12 +136,12 @@ bool Game::isGameOver() {
 }
 
 std::list<ImageRenderable*>* Game::getObjectsPtr() {
-    return &this->objects;
+    return &this->objects_;
 }
 
 void Game::collisionWall() {
-    std::lock_guard lg(ballsMutex);
-    for(Ball *&ball : balls) {
+    std::lock_guard lg(balls_mutex_);
+    for(Ball *&ball : balls_) {
         R2Point &ballPoint = ball->getPoint();
 
         double r = ball->getRadius();
@@ -121,30 +149,30 @@ void Game::collisionWall() {
         double by = ballPoint.get_y();
 
         if (bx <= r) {
-            ballPoint.set_x(r);
+            ballPoint.setX(r);
             ball->reverseDx();
         }
-        if (width - bx <= r) {
-            ballPoint.set_x(width - r);
+        if (width_ - bx <= r) {
+            ballPoint.setX(width_ - r);
             ball->reverseDx();
         }
         if (by <= r) {
-            ballPoint.set_y(r);
+            ballPoint.setY(r);
             ball->reverseDy();
         }
-        if (height - by <= r) {
-            startX = bx;
-            ball->setdx(0);
-            ball->setdy(0);
-            ballPoint.set_y(height - r);
+        if (height_ - by <= r) {
+            start_x_ = bx;
+            ball->setDx(0);
+            ball->setDy(0);
+            ballPoint.setY(height_ - r);
         }
     }
 }
 void Game::collisionBlock() {
-    std::lock_guard lg(ballsMutex);
-    for(Ball *ball : balls) {
-        std::lock_guard lg2(blocksMutex);
-        for(Block *block : blocks) {
+    std::lock_guard lg(balls_mutex_);
+    for(Ball *ball : balls_) {
+        std::lock_guard lg2(blocks_mutex_);
+        for(Block *block : blocks_) {
             int num = block->meet(*ball);
             // std::cout << block->getPoint().get_x() << ", " << block->getPoint().get_y() << " //// ";
 
@@ -166,8 +194,8 @@ void Game::collisionBlock() {
                 // ball->move();
 
                 if (hp <= 0) {
-                    blocks.remove(block);
-                    objects.remove(block);
+                    blocks_.remove(block);
+                    objects_.remove(block);
                     delete block;
                 }
 
@@ -180,32 +208,32 @@ void Game::collisionBlock() {
 }
 
 int Game::nextLevel() {
-    level += 1;
+    level_ += 1;
     // std::cout << "next level called" << std::endl;
 
     {
-        std::lock_guard lg2(blocksMutex);
+        std::lock_guard lg2(blocks_mutex_);
 
-        for (Block *block : blocks) {
+        for (Block *block : blocks_) {
             R2Point &point = block->getPoint();
-            point.set_y(point.get_y() + block->getHeight() + block_margin);
+            point.setY(point.get_y() + block->getHeight() + block_margin_);
         }
 
-        int empty_position = rand() % max_block_cnt_x;
-        int block_width = (width - block_margin * max_block_cnt_x * 2) / max_block_cnt_x;
-        int block_height = (ingameHeight - block_margin * max_block_cnt_y * 2) / max_block_cnt_y;
-        for (int i = 0; i < max_block_cnt_x; i++) {
+        int empty_position = rand() % max_block_cnt_x_;
+        int block_width = (width_ - block_margin_ * max_block_cnt_x_ * 2) / max_block_cnt_x_;
+        int block_height = (ingame_height_ - block_margin_ * max_block_cnt_y_ * 2) / max_block_cnt_y_;
+        for (int i = 0; i < max_block_cnt_x_; i++) {
             if (i == empty_position) {
                 continue;
             }
             //std::cout << "phase 12" << std::endl;
 
-            auto* block = new Block(block_margin + i * (block_width + block_margin), block_margin, block_width, block_height, level, level, 255, 0, 0);
+            auto* block = new Block(block_margin_ + i * (block_width + block_margin_), block_margin_, block_width, block_height, level_, level_, 255, 0, 0);
 
             //std::cout << "phase 13" << std::endl;
-            objects.push_back(block);
+            objects_.push_back(block);
             //std::cout << "phase 14" << std::endl;
-            blocks.push_back(block);
+            blocks_.push_back(block);
             //std::cout << "phase 15" << std::endl;
 
             // std::cout << block->getSkipRender() << std::endl; // ( false
@@ -213,26 +241,26 @@ int Game::nextLevel() {
     }
 
     // gameStart(level + 1);
-    auto* ball = new Ball(startX, 350, 6, 91, 168, 244, 255);
-    auto& mainBallPoint = main_ball->getPoint();
+    auto* ball = new Ball(start_x_, 350, 6, 91, 168, 244, 255);
+    auto& mainBallPoint = main_ball_->getPoint();
     auto& newBallPoint = ball->getPoint();
-    newBallPoint.set_xy(mainBallPoint.get_x(), mainBallPoint.get_y());
+    newBallPoint.setXY(mainBallPoint.get_x(), mainBallPoint.get_y());
 
-    balls.push_back(ball);
-    objects.push_back(ball);
+    balls_.push_back(ball);
+    objects_.push_back(ball);
 
     // collect ball at one point
-    for (Ball *&ball : balls) {
+    for (Ball *&ball : balls_) {
         auto& point = ball->getPoint();
         // for (int i = point.get_x(); i < startX; i++) {
         //     std::this_thread::sleep_for(std::chrono::milliseconds(1));
         //     point.set_x(i);
         // }
-        point.set_x(startX);
+        point.setX(start_x_);
     }
 
     // check game over
-    if (isGameOver()) {
+    if (checkGameOver()) {
         gameOver();
     }
 
@@ -242,12 +270,12 @@ int Game::nextLevel() {
 
 void Game::render(png_bytep* png_bytep_data) {
     // std::cout << main_arrow_helper->getSkipRender() << std::endl;
-    for (ImageRenderable* &it : objects) {
+    for (ImageRenderable* &it : objects_) {
         if (it->getSkipRender()) {
             continue;
         }
 
-        it->render(width, height, png_bytep_data);
+        it->render(width_, height_, png_bytep_data);
         // std::cout << "rendering: "<< it->getSkipRender() << std::endl;
     }
 
@@ -256,40 +284,40 @@ void Game::render(png_bytep* png_bytep_data) {
 }
 
 void Game::fire() {
-    double norm = sqrt(dx * dx + dy * dy) / 10;
+    double norm = sqrt(dx_ * dx_ + dy_ * dy_) / 10;
     if (norm == 0) {
         return;
     }
 
-    phaseRunning.store(true);
+    phase_running_.store(true);
 
     std::list<Ball*> localBalls;
     {
-        std::lock_guard lg(ballsMutex);
-        localBalls = balls;   // 포인터 목록만 복사
+        std::lock_guard lg(balls_mutex_);
+        localBalls = balls_;   // 포인터 목록만 복사
     }
 
     for (Ball* &ball : localBalls) {
-        ball->setdx(dx / norm);
-        ball->setdy(dy / norm);
+        ball->setDx(dx_ / norm);
+        ball->setDy(dy_ / norm);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 }
 
 void Game::checkCurrentPhaseOver() {
-    if (phaseRunning.load()) {
-        std::lock_guard lg(ballsMutex);
+    if (phase_running_.load()) {
+        std::lock_guard lg(balls_mutex_);
         // ball radius;
         bool tf = true;
-        for (Ball* &ball : balls) {
-            if (ball->getdx() != 0 || ball->getdy() != 0) {
+        for (Ball* &ball : balls_) {
+            if (ball->getDx() != 0 || ball->getDy() != 0) {
                 tf = false;
             }
         }
 
         // std::cout << "Game Over: " << tf << std::endl;
         if (tf) {
-            phaseRunning.store(false);
+            phase_running_.store(false);
             nextLevel();
         }
     }
@@ -299,19 +327,30 @@ void Game::checkCurrentPhaseOver() {
 
 
 void Game::onMouseLeftDown(const wxMouseEvent &e) {
-    const auto p = e.GetPosition();
-    this->mouse_down_x = p.x;
-    this->mouse_down_y = p.y;
+    if (isGameOver()) {
+        return;
+    }
 
-    main_arrow_helper->setSkipRender(false);
-    R2Point &point = main_arrow_helper->getPoint();
-    R2Point &ballPoint = main_ball->getPoint();
-    point.set_xy(ballPoint.get_x(), ballPoint.get_y());
+    const auto p = e.GetPosition();
+    this->mouse_down_x_ = p.x;
+    this->mouse_down_y_ = p.y;
+
+    main_arrow_helper_->setSkipRender(false);
+    R2Point &point = main_arrow_helper_->getPoint();
+    R2Point &ballPoint = main_ball_->getPoint();
+    point.setXY(ballPoint.get_x(), ballPoint.get_y());
     //std::cout << "game: mouse down" << std::endl;
 }
 
 void Game::onMouseLeftUp(const wxMouseEvent &e) {
-    main_arrow_helper->setSkipRender(true);
+    if (isGameOver()) {
+        init();
+        gameStart(1);
+
+        return;
+    }
+
+    main_arrow_helper_->setSkipRender(true);
 
     std::thread t([this]() {
         fire();
@@ -321,23 +360,27 @@ void Game::onMouseLeftUp(const wxMouseEvent &e) {
 }
 
 void Game::onMouseMove(const wxMouseEvent &e) {
+    if (isGameOver()) {
+        return;
+    }
+
     //std::cout << "mouse move" << std::endl;
     //std::cout << e.Dragging() << ", , " << e.LeftIsDown() << std::endl;
     if (e.Dragging() && e.LeftIsDown()) {
         const wxPoint p = e.GetPosition();
 
-        dx = p.x - mouse_down_x;
-        dy = p.y - mouse_down_y;
-        if (dx == 0) {
+        dx_ = p.x - mouse_down_x_;
+        dy_ = p.y - mouse_down_y_;
+        if (dx_ == 0) {
             return;
         }
 
         // double slope = static_cast<double>(dy) / dx;
-        const double theta = -atan2(dy, dx);
+        const double theta = -atan2(dy_, dx_);
 
         // std::cout << p.x << ", " << p.y << ", 기울기: " << slope << std::endl;
 
-        main_arrow_helper->setTheta(theta);
+        main_arrow_helper_->setTheta(theta);
     }
 }
 

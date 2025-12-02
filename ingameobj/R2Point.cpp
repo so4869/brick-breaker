@@ -5,23 +5,23 @@
 #include "R2Point.h"
 
 double R2Point::get_x() {
-    return this->x;
+    return this->x_;
 }
 
 double R2Point::get_y() {
-    return this->y;
+    return this->y_;
 }
 
 
-void R2Point::set_x(double x){
-    this->x = x;
+void R2Point::setX(double x){
+    this->x_ = x;
 }
 
-void R2Point::set_y(double y){
-    this->y = y;
+void R2Point::setY(double y){
+    this->y_ = y;
 }
 
-void R2Point::set_xy(double x, double y){
-    this->x = x;
-    this->y = y;
+void R2Point::setXY(double x, double y){
+    this->x_ = x;
+    this->y_ = y;
 }

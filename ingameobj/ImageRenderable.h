@@ -16,11 +16,11 @@
 class ImageRenderable {
 protected:
     R2Point point;
-    unsigned char R = 0, G = 0, B = 0, A = 0;
-    bool skipRender = false;
+    unsigned char r_ = 0, g_ = 0, b_ = 0, a_ = 0;
+    bool skip_render_ = false;
 public:
     ImageRenderable() = default;
-    ImageRenderable(unsigned char R, unsigned char G, unsigned char B, unsigned char A): R(R), G(G), B(B), A(A) {}
+    ImageRenderable(unsigned char r, unsigned char g, unsigned char b, unsigned char a): r_(r), g_(g), b_(b), a_(a) {}
     virtual ~ImageRenderable() = default;
 
     virtual void render(int max_width, int max_height, png_bytep* &png_vec) = 0;
@@ -28,9 +28,9 @@ public:
     void setPoint(int x, int y);
     R2Point& getPoint();
     bool getSkipRender();
-    void setSkipRender(bool skipRender);
+    void setSkipRender(bool skip_render);
 
-    void setRGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A);
+    void setRGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 };
 
 

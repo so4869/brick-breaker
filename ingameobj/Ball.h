@@ -18,21 +18,21 @@ void drawFilledCircleRGBA(
 
 class Ball : public ImageRenderable {
 private:
-    double radius = 0.0;
-    int num = 1;
-    double dx = 0, dy = 0;
+    double radius_ = 0.0;
+    int num_ = 1;
+    double dx_ = 0, dy_ = 0;
 public:
     Ball(int center_x, int center_y, double radius,
-        unsigned char R, unsigned char G, unsigned char B, unsigned char A);
+        unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
     void render(int max_width, int max_height, png_bytep* &png_vec) override;
 
     double getRadius();
 
-    double getdx();
-    void setdx(double dx);
-    double getdy();
-    void setdy(double dy);
+    double getDx();
+    void setDx(double dx);
+    double getDy();
+    void setDy(double dy);
     void move();
 
     void reverseDx();

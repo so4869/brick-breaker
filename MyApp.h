@@ -15,24 +15,24 @@
 
 class MyApp : public wxApp {
 private:
-    std::thread image_render_thread;
-    std::thread background_thread;
-    std::atomic<bool> stopFlag = {false};
+    std::thread image_render_thread_;
+    std::thread background_thread_;
+    std::atomic<bool> stop_flag_ = {false};
 
-    std::mutex pngMutex;
-    std::vector<unsigned char> pngData;
-    std::vector<unsigned char> pngDataBuffer;
-    png_bytep *png_bytep_data = nullptr;
+    std::mutex png_mutex_;
+    std::vector<unsigned char> png_data_;
+    std::vector<unsigned char> png_data_buffer_;
+    png_bytep *png_bytep_data_ = nullptr;
 
-    MyFrame *frame = nullptr;
-    Game *game = nullptr;
+    MyFrame *frame_ = nullptr;
+    Game *game_ = nullptr;
 
-    const int width = 400, height = 500;
-    const int bytes_per_pixel = 4;
+    const int width_ = 400, height_ = 500;
+    const int bytes_per_pixel_ = 4;
 
     // std::vector<ImageRenderable*> objects;
 
-    void consist_png();
+    void consistPng();
 
 public:
     bool OnInit() override;

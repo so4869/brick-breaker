@@ -17,42 +17,45 @@
 
 class Game {
 private:
-    const int width, height;
-    int startX;
-    const int ingameHeight = height - 140;
-    int max_block_cnt_x = 6;
-    int max_block_cnt_y = 8;
+    const int width_, height_;
+    int start_x_;
+    const int ingame_height_ = height_ - 140;
+    int max_block_cnt_x_ = 6;
+    int max_block_cnt_y_ = 8;
 
-    int block_margin = 3;
+    int block_margin_ = 3;
 
     // todo://뭔지 모르겟으나 이따 화긴
-    int startStage = 0;
+    int start_stage_ = 0;
 
-    std::list<ImageRenderable*> objects;
+    std::list<ImageRenderable*> objects_;
 
-    std::mutex ballsMutex;
-    std::list<Ball*> balls;
-    std::mutex blocksMutex;
-    std::list<Block*> blocks;
+    std::mutex balls_mutex_;
+    std::list<Ball*> balls_;
+    std::mutex blocks_mutex_;
+    std::list<Block*> blocks_;
 
 
-    std::atomic<bool> phaseRunning = {false};
+    std::atomic<bool> game_over_ = {true};
+    std::atomic<bool> phase_running_ = {false};
 
-    int dx, dy;
-    int level = 1;
-    Ball* main_ball = nullptr;
-    ArrowHelper* main_arrow_helper = nullptr;
+    int dx_, dy_;
+    int level_ = 1;
+    Ball* main_ball_ = nullptr;
+    ArrowHelper* main_arrow_helper_ = nullptr;
 
-    int mouse_down_x, mouse_down_y;
+    int mouse_down_x_, mouse_down_y_;
 
 public:
     Game(int width, int height);
 
     ~Game();
 
+    void init();
     void gameStart(int level);
     void gameOver();
     bool isGameOver();
+    bool checkGameOver();
 
     std::list<ImageRenderable*>* getObjectsPtr();
 
