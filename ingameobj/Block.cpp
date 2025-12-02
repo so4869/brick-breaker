@@ -177,7 +177,12 @@ Block::Block(int x, int y, int width, int height, int max_hp, int hp, unsigned c
 }
 
 void Block::render(int max_width, int max_height, png_bytep *&png_vec) {
-    drawRectangleWithNumber(png_vec, max_width, max_height, point.get_x(), point.get_y(),  width_, height_, hp_, 2, r_, g_, b_, a_);
+    float k = static_cast<float>(max_hp_ - hp_) / max_hp_;
+    unsigned char r = r_ + (255 - r_) * k;
+    unsigned char g = g_ + (255 - g_) * k;
+    unsigned char b = b_ + (255 - b_) * k;
+
+    drawRectangleWithNumber(png_vec, max_width, max_height, point.get_x(), point.get_y(),  width_, height_, hp_, 2, r, g, b, a_);
 }
 
 
@@ -200,7 +205,6 @@ int Block::getHp() {
 }
 void Block::setHp(int hp) {
     this->hp_ = hp;
-    // this->A = hp / maxHp * 255;
 }
 
 int Block::meet(Ball &ball) {
