@@ -344,9 +344,6 @@ void Game::onMouseLeftDown(const wxMouseEvent &e) {
 
 void Game::onMouseLeftUp(const wxMouseEvent &e) {
     if (isGameOver()) {
-        init();
-        gameStart(1);
-
         return;
     }
 
