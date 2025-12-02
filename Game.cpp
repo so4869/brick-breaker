@@ -280,10 +280,10 @@ void Game::render(png_bytep* png_bytep_data) {
         // std::cout << "rendering: "<< it->getSkipRender() << std::endl;
     }
 
-    if (isPhaseRunning()) {
+    // if (isPhaseRunning()) {
         collisionWall();
         collisionBlock();
-    }
+    // }
 }
 
 void Game::fire() {
