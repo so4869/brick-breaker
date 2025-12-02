@@ -13,6 +13,11 @@
 #include "ingameobj/Block.h"
 
 Game::Game(const int width, const int height): width_(width), height_(height), start_x_(width / 2) {
+
+    block_width_ = (width_ - (block_margin_ * max_block_cnt_x_ + 2)) / max_block_cnt_x_;
+    block_height_ = (ingame_height_ - block_margin_ * max_block_cnt_y_ * 2) / max_block_cnt_y_;
+    // std::cout << "block_width: " << block_width_ << ", block_height: " << block_height_ << std::endl;
+
     main_arrow_helper_ = new ArrowHelper(50, 350, 100, 0, 91, 168, 244, 128);
     main_arrow_helper_->setSkipRender(true);
     objects_.push_back(main_arrow_helper_);
@@ -51,11 +56,6 @@ void Game::gameStart(const int level) {
     this->level_ = level;
     int empty_position = rand() % max_block_cnt_x_;
 
-    int block_width = (width_ - block_margin_ * max_block_cnt_x_ * 2) / max_block_cnt_x_;
-    int block_height = (ingame_height_ - block_margin_ * max_block_cnt_y_ * 2) / max_block_cnt_y_;
-
-    // std::cout << "block_width: " << block_width << ", block_height: " << block_height << std::endl;
-
     {
         std::lock_guard lg2(blocks_mutex_);
         //std::cout << "phase 0" << std::endl;
@@ -65,7 +65,7 @@ void Game::gameStart(const int level) {
             }
             //std::cout << "phase 12" << std::endl;
 
-            auto* block = new Block(block_margin_ + i * (block_width + block_margin_), block_margin_, block_width, block_height, level, level, 255, 0, 0);
+            auto* block = new Block(block_margin_ + i * (block_width_ + block_margin_), block_height_ + block_margin_, block_width_, block_height_, level, level, 255, 0, 0);
 
             //std::cout << "phase 13" << std::endl;
             objects_.push_back(block);
@@ -134,6 +134,11 @@ bool Game::checkGameOver() {
 
     return false;
 }
+
+bool Game::isPhaseRunning() {
+    return phase_running_.load();
+}
+
 
 std::list<ImageRenderable*>* Game::getObjectsPtr() {
     return &this->objects_;
@@ -222,15 +227,13 @@ int Game::nextLevel() {
         }
 
         int empty_position = rand() % max_block_cnt_x_;
-        int block_width = (width_ - block_margin_ * max_block_cnt_x_ * 2) / max_block_cnt_x_;
-        int block_height = (ingame_height_ - block_margin_ * max_block_cnt_y_ * 2) / max_block_cnt_y_;
         for (int i = 0; i < max_block_cnt_x_; i++) {
             if (i == empty_position) {
                 continue;
             }
             //std::cout << "phase 12" << std::endl;
 
-            auto* block = new Block(block_margin_ + i * (block_width + block_margin_), block_margin_, block_width, block_height, level_, level_, 255, 0, 0);
+            auto* block = new Block(block_margin_ + i * (block_width_ + block_margin_), block_height_ + block_margin_, block_width_, block_height_, level_, level_, 255, 0, 0);
 
             //std::cout << "phase 13" << std::endl;
             objects_.push_back(block);
@@ -277,7 +280,7 @@ void Game::render(png_bytep* png_bytep_data) {
         // std::cout << "rendering: "<< it->getSkipRender() << std::endl;
     }
 
-    if (phase_running_.load()) {
+    if (isPhaseRunning()) {
         collisionWall();
         collisionBlock();
     }
@@ -305,7 +308,7 @@ void Game::fire() {
 }
 
 void Game::checkCurrentPhaseOver() {
-    if (phase_running_.load()) {
+    if (isPhaseRunning()) {
         std::lock_guard lg(balls_mutex_);
         // ball radius;
         bool tf = true;

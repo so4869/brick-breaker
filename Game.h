@@ -22,6 +22,7 @@ private:
     const int ingame_height_ = height_ - 140;
     int max_block_cnt_x_ = 6;
     int max_block_cnt_y_ = 8;
+    int block_width_, block_height_;
 
     int block_margin_ = 3;
 
@@ -56,6 +57,7 @@ public:
     void gameOver();
     bool isGameOver();
     bool checkGameOver();
+    bool isPhaseRunning();
 
     std::list<ImageRenderable*>* getObjectsPtr();
 
