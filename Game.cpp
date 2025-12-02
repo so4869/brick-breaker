@@ -7,7 +7,7 @@
 #include <iostream>
 #include <ostream>
 #include <random>
-#include <bits/this_thread_sleep.h>
+#include <thread>
 
 #include "ingameobj/Ball.h"
 #include "ingameobj/Block.h"
@@ -34,7 +34,7 @@ void Game::gameStart(const int level) {
     int block_width = (width - block_margin * max_block_cnt_x * 2) / max_block_cnt_x;
     int block_height = (ingameHeight - block_margin * max_block_cnt_y * 2) / max_block_cnt_y;
 
-    std::cout << "block_width: " << block_width << ", block_height: " << block_height << std::endl;
+    // std::cout << "block_width: " << block_width << ", block_height: " << block_height << std::endl;
 
     {
         std::lock_guard lg2(blocksMutex);
@@ -98,8 +98,8 @@ bool Game::isGameOver() {
             return true;
         }
 
-        std::cout << "height: " << height << std::endl;
-        std::cout << "end: " << end << std::endl;
+        // std::cout << "height: " << height << std::endl;
+        // std::cout << "end: " << end << std::endl;
 
         i++;
     }
@@ -312,7 +312,11 @@ void Game::onMouseLeftDown(const wxMouseEvent &e) {
 
 void Game::onMouseLeftUp(const wxMouseEvent &e) {
     main_arrow_helper->setSkipRender(true);
-    fire();
+
+    std::thread t([this]() {
+        fire();
+    });
+    t.detach();
     //std::cout << "game: mouse up" << std::endl;
 }
 

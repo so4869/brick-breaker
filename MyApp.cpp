@@ -50,7 +50,7 @@ bool MyApp::OnInit() {
     this->image_render_thread = std::thread([this]() {
         while (!this->stopFlag.load()) {
             consist_png();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 120 * 2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 120));
         }
     });
 
@@ -60,7 +60,7 @@ bool MyApp::OnInit() {
             // this->game->collisionWall();
             // this->game->collisionBlock();
             this->game->checkCurrentPhaseOver();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 120 * 2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 120));
         }
     });
 

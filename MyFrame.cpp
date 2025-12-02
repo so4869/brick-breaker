@@ -10,7 +10,7 @@
 
 MyFrame::MyFrame(const int width, const int height)
         : wxFrame(nullptr, wxID_ANY, "brick-breaker", wxDefaultPosition,
-            wxSize(width, height)), width(width), height(height),
+            wxSize(width, height + 50)), width(width), height(height + 50),
             renderTimer(this)
 {
     bitmap_ = new wxStaticBitmap(this, wxID_ANY, wxImage());
