@@ -169,6 +169,8 @@ void Game::collisionWall() {
     }
 }
 void Game::collisionBlock() {
+    // std::cout << "collisionBlock called" << std::endl;
+
     std::lock_guard lg(balls_mutex_);
     for(Ball *ball : balls_) {
         std::lock_guard lg2(blocks_mutex_);
@@ -242,20 +244,16 @@ int Game::nextLevel() {
 
     // gameStart(level + 1);
     auto* ball = new Ball(start_x_, 350, 6, 91, 168, 244, 255);
-    auto& mainBallPoint = main_ball_->getPoint();
-    auto& newBallPoint = ball->getPoint();
-    newBallPoint.setXY(mainBallPoint.get_x(), mainBallPoint.get_y());
+    auto& main_ball_point = main_ball_->getPoint();
+    auto& new_ball_point = ball->getPoint();
+    new_ball_point.setXY(main_ball_point.get_x(), main_ball_point.get_y());
 
     balls_.push_back(ball);
     objects_.push_back(ball);
 
     // collect ball at one point
-    for (Ball *&ball : balls_) {
-        auto& point = ball->getPoint();
-        // for (int i = point.get_x(); i < startX; i++) {
-        //     std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        //     point.set_x(i);
-        // }
+    for (Ball *&ball1 : balls_) {
+        auto& point = ball1->getPoint();
         point.setX(start_x_);
     }
 
@@ -279,8 +277,10 @@ void Game::render(png_bytep* png_bytep_data) {
         // std::cout << "rendering: "<< it->getSkipRender() << std::endl;
     }
 
-    collisionWall();
-    collisionBlock();
+    if (phase_running_.load()) {
+        collisionWall();
+        collisionBlock();
+    }
 }
 
 void Game::fire() {
@@ -291,13 +291,13 @@ void Game::fire() {
 
     phase_running_.store(true);
 
-    std::list<Ball*> localBalls;
+    std::list<Ball*> local_balls;
     {
         std::lock_guard lg(balls_mutex_);
-        localBalls = balls_;   // 포인터 목록만 복사
+        local_balls = balls_;   // 포인터 목록만 복사
     }
 
-    for (Ball* &ball : localBalls) {
+    for (Ball* &ball : local_balls) {
         ball->setDx(dx_ / norm);
         ball->setDy(dy_ / norm);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
